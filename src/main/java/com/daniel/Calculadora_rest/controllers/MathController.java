@@ -1,4 +1,4 @@
-package com.daniel.Calculadora_rest;
+package com.daniel.Calculadora_rest.controllers;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -9,9 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.daniel.Calculadora_rest.converters.NumberConverter;
 import com.daniel.Calculadora_rest.exceptions.UnsupportedMathOperationException;
+import com.daniel.Calculadora_rest.math.SimpleMath;
 
 @RestController
 public class MathController {
+    private final AtomicLong counter = new AtomicLong();
+
+    private SimpleMath math = new SimpleMath();
 
     // Somar 
     @RequestMapping(value = "/sum/{numberOne}/{numberTwo}" ,method=RequestMethod.GET)
@@ -24,7 +28,7 @@ public class MathController {
                 throw new UnsupportedMathOperationException("Please set a numeric value!"); 
                 
             }
-            return (NumberConverter.convertToDouble(numberOne) + NumberConverter.convertToDouble(numberTwo));
+            return math.sum(NumberConverter.convertToDouble(numberOne) , NumberConverter.convertToDouble(numberTwo));
         }
     // Subtrair
     @RequestMapping(value = "/sub/{numberOne}/{numberTwo}", method = RequestMethod.GET)
@@ -35,7 +39,7 @@ public class MathController {
         if (!NumberConverter.isNumeric(numberOne) || !NumberConverter.isNumeric(numberTwo)) {
             throw new UnsupportedMathOperationException("Please set a numeric value!"); 
         }
-        return (NumberConverter.convertToDouble(numberOne) - NumberConverter.convertToDouble(numberTwo));
+        return math.sub(NumberConverter.convertToDouble(numberOne) , NumberConverter.convertToDouble(numberTwo));
     }
 
     // Multiplicar
@@ -47,7 +51,7 @@ public class MathController {
         if (!NumberConverter.isNumeric(numberOne) || !NumberConverter.isNumeric(numberTwo)) {
             throw new UnsupportedMathOperationException("Please set a numeric value!");
         }
-        return (NumberConverter.convertToDouble(numberOne) * NumberConverter.convertToDouble(numberTwo));
+        return math.mult(NumberConverter.convertToDouble(numberOne) , NumberConverter.convertToDouble(numberTwo));
     }
     // Dividir
     @RequestMapping(value = "/div/{numberOne}/{numberTwo}", method = RequestMethod.GET)
@@ -58,9 +62,18 @@ public class MathController {
         if (!NumberConverter.isNumeric(numberOne) || !NumberConverter.isNumeric(numberTwo)) {
             throw new UnsupportedMathOperationException("Please set a numeric value!");
         }
-        return (NumberConverter.convertToDouble(numberOne) / NumberConverter.convertToDouble(numberTwo));
+        return math.div(NumberConverter.convertToDouble(numberOne) , NumberConverter.convertToDouble(numberTwo));
     }
-
+    @RequestMapping(value = "/mean/{numberOne}/{numberTwo}")
+    public Double mean(
+        @PathVariable(value = "numberOne") String numberOne,
+        @PathVariable(value = "numberTwo") String numberTwo
+    )throws Exception{
+        if (!NumberConverter.isNumeric(numberOne) || !NumberConverter.isNumeric(numberTwo)) {
+            throw new UnsupportedMathOperationException("Please set a numeric value!");
+        }
+        return math.mean(NumberConverter.convertToDouble(numberOne), NumberConverter.convertToDouble(numberTwo));
+    }
     // Raiz
     @RequestMapping(value = "/square/{number}", method = RequestMethod.GET)
     public Double square(
